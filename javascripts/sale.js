@@ -1,41 +1,63 @@
+const products =[
+  {
+    id:1, 
+    name:"オリジナルブレンド200g",
+    price: 500
+  },
+  {
+    id:2,
+    name:"オリジナルブレンド500g",
+    price: 900
+  },
+  {
+    id:3,
+    name:"スペシャルブレンド200g",
+    price: 700
+  },
+  {
+    id:4,
+    name:"スペシャルブレンド500g",
+    price: 1200
+  },
+]
 const priceElement = document.getElementById("product");
 const numberElement = document.getElementById("number");
 let purchases = [];
 
-function add(){
-    const price = parseInt(priceElement.value);
-    const number = parseInt(numberElement.value);
-    const purchase = {
-      price: price,
-      number: number,
-  };
- purchases.push(purchase);
- window.alert(`${display()}\n小計${subtotal()}円`);
-} 
 
-function display() {
-  let string = "";
-  for(let i=0; i<purchases.length; i++){
-    string += `${purchases[i].price}円が${purchases[i].number}点\n`;
+function add() {
+  const productId = parseInt(priceElement.value);
+  const product = products.find(item => item.id == productId);
+  const number = parseInt(numberElement.value);
+
+  let purchase = {
+    productId: productId,
+    product: product,
+    number: number,
+  };
+
+  const newPurchase = purchases.findIndex((item) => item.productId === purchase.price)
+  if(purchases.length < 1 || newPurchase === -1) {
+    purchases.push(purchase)
+  } else {
+    purchases[newPurchase].number += purchase.number
   }
-  return string;
+
+window.alert(`${display()}\n小計${subtotal()}円`);
+priceElement.value = "";
+numberElement.value = "";
 }
 
 function subtotal() {
-  let sum = 0;
-    for(let i=0; i<purchases.length; i++){
-    sum += purchases[i].price * purchases[i].number;
-  }
-  return sum;
+  return purchases.reduce((prev, purchase) => {
+    return prev + purchase.product.price * purchase.number 
+  }, 0);
 }
 
-function calc() {
-  const sum = subtotal();
-  const postage = calcPostageFromPurchase(sum);
-  window.alert(`小計は${sum}円、送料は${postage}円です。合計は${sum + postage}円です`);
-  purchases = [];
-  priceElement.value= "";
-  numberElement.value = "";
+function display() {
+  return purchases.map(purchase => {
+    return `${purchase.product.name} ${purchase.product.price}円${purchase.number}点`
+  }).join("");
 }
 
 function calcPostageFromPurchase(sum) {
@@ -46,6 +68,15 @@ function calcPostageFromPurchase(sum) {
   } else {
    return 250;
   }
+}
+
+function calc() {
+  const sum = subtotal();
+  const postage = calcPostageFromPurchase(sum);
+  window.alert(`小計は${sum}円、送料は${postage}円です。合計は${sum + postage}円です`);
+  purchases = [];
+  priceElement.value= "";
+  numberElement.value = "";
 }
 
 
